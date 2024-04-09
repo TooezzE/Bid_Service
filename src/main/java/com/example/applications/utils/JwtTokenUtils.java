@@ -41,11 +41,11 @@ public class JwtTokenUtils {
                 .compact();
     }
 
-    public String getUsername(String token) {
+    public String getUsernameFromToken(String token) {
         return getAllClaimsFromToken(token).getSubject();
     }
 
-    public List<String> getRoles(String token) {
+    public List<String> getUserRolesFromToken(String token) {
         return getAllClaimsFromToken(token).get("roles", List.class);
     }
 

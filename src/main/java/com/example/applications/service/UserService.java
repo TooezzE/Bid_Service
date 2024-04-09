@@ -1,10 +1,10 @@
 package com.example.applications.service;
 
 
+import com.example.applications.exception.UserNotFoundException;
 import com.example.applications.model.dto.RegistrationUserDto;
 import com.example.applications.model.entity.User;
 import com.example.applications.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,22 +20,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    private UserRepository userRepository;
-    private RoleService roleService;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setRoleService(RoleService roleService) {
         this.roleService = roleService;
-    }
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -46,9 +37,7 @@ public class UserService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(
-                String.format("Пользователь '%s' не найден", username)
-        ));
+        User user = findByUsername(username).orElseThrow(() -> new UserNotFoundException());
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
@@ -56,12 +45,13 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public User createNewUser(RegistrationUserDto registrationUserDto) {
+    public User createUser(RegistrationUserDto registrationUserDto) {
         User user = new User();
         user.setUsername(registrationUserDto.getUsername());
-        user.setUsername(registrationUserDto.getEmail());
+        user.setName(registrationUserDto.getName());
         user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
-        user.setRoles(List.of(roleService.getUserRole()));
+        user.setPhone(registrationUserDto.getPhone());
+        user.setRoles(List.of(roleService.getDefaultRole()));
         return userRepository.save(user);
     }
 }

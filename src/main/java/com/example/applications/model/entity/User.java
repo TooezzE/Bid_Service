@@ -20,11 +20,10 @@ public class User {
     private String password;
     private String name;
     private String phone;
+    @OneToMany
+    @Column(name = "user_bids")
+    private List<Bid> userBids;
     @ManyToMany
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
     private Collection<Role> roles;
+
 }
