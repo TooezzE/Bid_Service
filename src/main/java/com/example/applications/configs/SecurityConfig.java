@@ -42,14 +42,14 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
-                .requestMatchers("/secured").authenticated()
-                .requestMatchers("/info").authenticated()
-                .requestMatchers("/admin").hasRole("ADMIN")
-                .anyRequest().permitAll()).sessionManagement(s -> s
+                                .requestMatchers("/secured").authenticated()
+                                .requestMatchers("/info").authenticated()
+                                .requestMatchers("/admin").hasRole("ADMIN")
+                                .anyRequest().permitAll()).sessionManagement(s -> s
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(Customizer.withDefaults())
-                //.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+
         return http.build();
     }
 
