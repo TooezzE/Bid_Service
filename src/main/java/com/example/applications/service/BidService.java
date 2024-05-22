@@ -1,6 +1,6 @@
 package com.example.applications.service;
 
-import com.example.applications.exception.BidAlreadySentException;
+import com.example.applications.exception.BidCantBeEditedException;
 import com.example.applications.model.entity.Bid;
 import com.example.applications.repository.BidRepository;
 import com.example.applications.repository.UserRepository;
@@ -15,32 +15,18 @@ import java.util.stream.Collectors;
 public class BidService {
 
     private final BidRepository bidRepository;
-    private final UserRepository userRepository;
 
-    public BidService(BidRepository bidRepository, UserRepository userRepository) {
+    public BidService(BidRepository bidRepository) {
         this.bidRepository = bidRepository;
-        this.userRepository = userRepository;
     }
 
-    public void createBidDraft(String userName, String userMessage) {
+    public void createBid(Long userId, String userMessage) {
         Bid bid = new Bid();
         bid.setStatus(BidStatus.DRAFT);
         bid.setUserMessage(userMessage);
-        bid.setUserName(userName);
-        bid.setUserPhone(userRepository.findByUsername(userName).get().getPhone());
+        bid.setUser_id(userId);
 
         bidRepository.save(bid);
-    }
-
-    public void createAndSendBid(String userName, String userMessage) {
-        Bid bid = new Bid();
-        bid.setStatus(BidStatus.SENT);
-        bid.setUserMessage(userMessage);
-        bid.setUserName(userName);
-        bid.setUserPhone(userRepository.findByUsername(userName).get().getPhone());
-
-        Long bidId = bidRepository.save(bid).getId();
-        sendBid(bidId);
     }
 
     public void editBid(Long bidId, String newUserMessage) {
@@ -48,11 +34,11 @@ public class BidService {
         if(newUserMessage.isBlank() || bid.getUserMessage().equals(newUserMessage)) {
             return;
         }
-        if (bid.getStatus().equals(BidStatus.DRAFT)) {
+        if (bid.getStatus().equals(BidStatus.SENT) || bid.getStatus().equals(BidStatus.ACCEPTED)) {
+           throw new BidCantBeEditedException();
+        } else {
             bid.setUserMessage(newUserMessage);
             bidRepository.save(bid);
-        } else {
-            throw new BidAlreadySentException();
         }
     }
 
@@ -94,7 +80,9 @@ public class BidService {
                 .collect(Collectors.toList());
     }
 
-    public List<Bid> getAllUserBidsBy() {
-        return bidRepository.findAll(Sort.unsorted());
+    public List<Bid> getAllUserBidsBy(Long userId) {
+        return bidRepository.findAll().stream()
+                .filter(b -> b.getUser_id() == userId)
+                .collect(Collectors.toUnmodifiableList());
     }
 }

@@ -1,7 +1,9 @@
 package com.example.applications.model.entity;
 
 import com.example.applications.model.enums.BidStatus;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -15,21 +17,23 @@ public class Bid {
     private Long id;
     @Enumerated(EnumType.STRING)
     private BidStatus status;
-    private String userName;
+    private Long user_id;
     private String userMessage;
-    private String userPhone;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate creationDate;
 
     public Bid() {
         this.creationDate = LocalDate.now();
     }
 
-    public Bid(Long id, BidStatus status, String userName, String userMessage, String userPhone) {
-        this.id = id;
-        this.status = status;
-        this.userName = userName;
+    public Bid(BidStatus status, Long user_id, String userMessage) {
+        if(status == null) {
+            this.status = BidStatus.DRAFT;
+        } else {
+            this.status = status;
+        }
+        this.user_id = user_id;
         this.userMessage = userMessage;
-        this.userPhone = userPhone;
         this.creationDate = LocalDate.now();
     }
 
@@ -49,12 +53,12 @@ public class Bid {
         this.status = status;
     }
 
-    public String getUserName() {
-        return userName;
+    public Long getUser_id() {
+        return user_id;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser_id(Long user_id) {
+        this.user_id = user_id;
     }
 
     public String getUserMessage() {
@@ -65,25 +69,17 @@ public class Bid {
         this.userMessage = userMessage;
     }
 
-    public String getUserPhone() {
-        return userPhone;
-    }
-
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Bid bid = (Bid) o;
-        return Objects.equals(id, bid.id) && status == bid.status && Objects.equals(userName, bid.userName) && Objects.equals(userMessage, bid.userMessage) && Objects.equals(userPhone, bid.userPhone);
+        return Objects.equals(id, bid.id) && status == bid.status && Objects.equals(user_id, bid.user_id) && Objects.equals(creationDate, bid.creationDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, status, userName, userMessage, userPhone);
+        return Objects.hash(id, user_id, creationDate);
     }
 
     @Override
@@ -91,9 +87,9 @@ public class Bid {
         return "Bid{" +
                 "id=" + id +
                 ", status=" + status +
-                ", userName='" + userName + '\'' +
+                ", user_id=" + user_id +
                 ", userMessage='" + userMessage + '\'' +
-                ", userPhone='" + userPhone + '\'' +
+                ", creationDate=" + creationDate +
                 '}';
     }
 }
