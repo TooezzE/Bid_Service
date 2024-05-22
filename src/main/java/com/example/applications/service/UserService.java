@@ -5,6 +5,7 @@ import com.example.applications.exception.UserNotFoundException;
 import com.example.applications.model.dto.RegistrationUserDto;
 import com.example.applications.model.entity.User;
 import com.example.applications.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,13 +21,24 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    private final UserRepository userRepository;
-    private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
+    private UserRepository userRepository;
+    private RoleService roleService;
+    private PasswordEncoder passwordEncoder;
+
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setRoleService(RoleService roleService) {
         this.roleService = roleService;
+    }
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 

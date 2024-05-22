@@ -2,7 +2,7 @@ package com.example.applications.model.entity;
 
 import lombok.Data;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.RequiredArgsConstructor;
 
 @Entity

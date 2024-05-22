@@ -1,9 +1,9 @@
 package com.example.applications.model.entity;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,10 +20,14 @@ public class User {
     private String password;
     private String name;
     private String phone;
-    @OneToMany
-    @Column(name = "user_bids")
+    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL)
     private List<Bid> userBids;
     @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Collection<Role> roles;
 
 }
